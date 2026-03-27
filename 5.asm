@@ -9,11 +9,15 @@ __CONFIG _INTRC_OSC_NOCLKOUT & _WDT_OFF & _PWRTE_ON & _MCLRE_ON & _BODEN_OFF & _
 CLRF PORTB           ; PORTB temizlenir, tüm bitler 0 yapılır
 
 COUNTER1 EQU h'20'   ; COUNTER1 ismi, RAM'deki 0x20 adresine atanır
+                     ; EQU → “eşitlemek / sabit tanımlamak” için kullanılır
 
 BANKSEL TRISB        ; TRISB register’ının bulunduğu bankaya geçilir
 
 MOVLW H'FE'          ; W register’a 0xFE yüklenir
 MOVWF TRISB          ; TRISB = 11111110 yapılır, sadece RB0 çıkış, diğer bitler giriş olur
+                     ; PIC’te:
+                     ;1 → Input (giriş)
+                     ;0 → Output (çıkış)
 
 MOVLW H'FF'          ; W register’a 0xFF yüklenir
 MOVWF TRISA          ; TRISA = 11111111 yapılır, PORTA’daki tüm pinler giriş olur
