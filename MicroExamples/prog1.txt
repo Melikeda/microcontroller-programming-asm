@@ -1,0 +1,18 @@
+;===PROG1.ASM=====================================
+LIST P=16F628A
+INCLUDE "P16F628A.INC"
+__CONFIG _INTRC_OSC_NOCLKOUT & _WDT_OFF & _PWRTE_ON & _MCLRE_ON & _BODEN_OFF & _LVP_OFF  & _CP_OFF
+
+;-----------------------------------------------------------
+ORG h'0000' ;indicates the address from which the program memory starts.
+CLRF PORTB ;clears the each bits of PORTB
+BSF STATUS,5 ;sets the 5th bit of PORTB as 1. By doing this we can travel to the BANK1
+CLRF TRISB
+BCF STATUS,5 ;resets the 5th bit of PORTB as 0. By doing this we can travel to the BANK0 again.
+BASLA ; this is a label.
+BSF PORTB,0 ;sets the 0th bit of PORTB as 1.
+DONGU		; infinite loop.
+GOTO DONGU	; infinite loop.
+END			; there is no instruction to be processed after this point by using the END statement
+			; at the end of the program.
+;---------------------------

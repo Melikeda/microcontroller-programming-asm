@@ -1,0 +1,50 @@
+;===PROG24.ASM
+	LIST	P=16F628A
+	INCLUDE	"P16F628A.INC"
+	__CONFIG _INTRC_OSC_NOCLKOUT & _WDT_OFF & _PWRTE_ON & _MCLRE_ON & _BODEN_OFF & _LVP_OFF & _CP_OFF
+;-----------------------------------------------------------
+	ORG	h'0000'	
+	GOTO	STARTLABEL	
+	ORG	h'0004'		;Interrupt address
+	GOTO	INT_SUBPROG	;Branches to the interrupt subprogram
+STARTLABEL				;Main Program
+SAYAC1	EQU	h'20'
+SAYAC2	EQU	h'21'
+	CLRF		PORTB		
+	BANKSEL	TRISB		
+	MOVLW	h'00000001'	
+	MOVWF	TRISB		
+	MOVLW	b'10111111'	;W ? b'10111111', falling edge
+	MOVWF	OPTION_REG	;OPTION_REG<-W
+	BANKSEL	PORTB		; 
+	BCF		INTCON, 1	; INTF<-0 to prevent recursive interrupts. 
+					
+	BSF		INTCON, 7	; GIE<-1 Allow all interrupts.
+	BSF		INTCON, 4	; Allow RB0/INT interrupt
+TURNON_TURNOFF
+	BSF		PORTB, 1	;led turns on
+	CALL	DELAYLABEL	;delay
+	BCF		PORTB, 1	;led turns off
+	CALL 	DELAYLABEL	;delay
+	GOTO		TURNON_TURNOFF	;iterates loop
+INT_SUBPROG			;Kesme alt programý(RB2’yi tersle)
+	BCF		INTCON,INTE	;prevent next possible interrupts
+	MOVLW	b'00000100'	;Load the bit that is being complemented to W
+	XORWF	PORTB,F	;RB2 is complemented. If it is turned on it will be turned off. Otherwise, if it is turned off it will be turned on.
+	BCF		INTCON,INTF	;INTF is cleared to prevent recursive interrupts. 
+	BSF		INTCON,INTE	;allow new possible interrupts 
+	RETFIE			;return to main program
+DELAYLABEL				;delay sub program.
+	MOVLW	h'FF'
+	MOVWF	SAYAC1
+DONGU1
+	MOVLW	h'FF'
+	MOVWF	SAYAC2
+DONGU2
+	DECFSZ	SAYAC2, F
+	GOTO		DONGU2
+	DECFSZ	SAYAC1, F
+	GOTO	DONGU1
+	RETURN
+	END
+;----------------------------------------------------------
